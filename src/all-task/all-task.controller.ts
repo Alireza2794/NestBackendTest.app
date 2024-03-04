@@ -30,13 +30,13 @@ export class AllTaskController {
     return this.allTaskService.findOne(ClientId);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateAllTaskDto: UpdateAllTaskDto) {
-    return this.allTaskService.update(+id, updateAllTaskDto);
+  @Put(':ClientId')
+  update(@Param('ClientId') ClientId: string, @Body() updateAllTaskDto: UpdateAllTaskDto) {
+    return this.allTaskService.update(ClientId, updateAllTaskDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.allTaskService.remove(+id);
+  @Delete(':ClientId')
+  remove(@Param('ClientId') ClientId: string) {
+    return this.allTaskService.remove(ClientId);
   }
 }

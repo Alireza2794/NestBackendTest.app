@@ -52,11 +52,19 @@ export class AllTaskService {
     return this.AllTaskList.find((task) => task.User_ClientId === ClientId);
   }
 
-  update(id: number, updateAllTaskDto: UpdateAllTaskDto) {
-    return `This action updates a #${id} allTask`;
+  update(ClientId: string, updateAllTaskDto: UpdateAllTaskDto): TaskListModel {
+    const Task = this.findOne(ClientId);
+    const { User_FirstName, User_LastName } = updateAllTaskDto;
+
+    Task.User_FirstName = User_FirstName;
+    Task.User_LastName = User_LastName;
+
+    return Task;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} allTask`;
+  remove(ClientId: string): boolean {
+    this.AllTaskList = this.AllTaskList.filter((task) => task.User_ClientId !== ClientId);
+
+    return true;
   }
 }
