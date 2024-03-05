@@ -1,26 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { v4 as uuid } from 'uuid';
 import { CreateAllTaskDto } from './dto/create-all-task.dto';
 import { GetTaskListDto } from './dto/get-all-task.dto';
 import { UpdateAllTaskDto } from './dto/update-all-task.dto';
 import { TaskListModel } from './models/all-task.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AllTask } from './entities/all-task.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AllTaskService {
-  private AllTaskList: TaskListModel[] = [
-    {
-      User_ClientId: uuid(),
-      User_FirstName: 'علیرضا',
-      User_LastName: 'حق شناس'
-    }
-  ];
 
-  findAll(): TaskListModel[] {
-    return this.AllTaskList;
+  constructor(
+    @InjectRepository(AllTask)
+    private readonly allTask_repository: Repository<AllTask>
+  ) { }
+
+  async findAll(): Promise<TaskListModel[]> {
+    return await this.allTask_repository.find();
   }
 
-  find(getTaskListDto: GetTaskListDto): TaskListModel[] {
-    let Tasks = this.findAll();
+  async find(getTaskListDto: GetTaskListDto): Promise<TaskListModel[]> {
+    let Tasks = await this.findAll();
 
     const { User_FirstName, User_LastName } = getTaskListDto;
 
@@ -35,25 +35,24 @@ export class AllTaskService {
     return Tasks;
   }
 
-  create(createAllTaskDto: CreateAllTaskDto): TaskListModel {
-    const { User_FirstName, User_LastName } = createAllTaskDto;
-    const Task: TaskListModel = {
-      User_ClientId: uuid(),
-      User_FirstName,
-      User_LastName
-    }
+  async create(createAllTaskDto: CreateAllTaskDto): Promise<TaskListModel> {
 
-    this.AllTaskList.push(Task);
+    const Task = await this.allTask_repository.create(createAllTaskDto);
+
+    this.allTask_repository.save(Task);
 
     return Task;
   }
 
-  findOne(ClientId: string): TaskListModel {
-    return this.AllTaskList.find((task) => task.User_ClientId === ClientId);
+  findOne(Id: number): TaskListModel {
+    // return this.AllTaskList.find((task) => task.User_ClientId === ClientId);
+
+    return null
   }
 
   update(ClientId: string, updateAllTaskDto: UpdateAllTaskDto): TaskListModel {
-    const Task = this.findOne(ClientId);
+    // const Task = this.findOne(ClientId);
+    let Task: any;
     const { User_FirstName, User_LastName } = updateAllTaskDto;
 
     Task.User_FirstName = User_FirstName;
@@ -63,7 +62,7 @@ export class AllTaskService {
   }
 
   remove(ClientId: string): boolean {
-    this.AllTaskList = this.AllTaskList.filter((task) => task.User_ClientId !== ClientId);
+    // this.AllTaskList = this.AllTaskList.filter((task) => task.User_ClientId !== ClientId);
 
     return true;
   }

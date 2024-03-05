@@ -12,28 +12,28 @@ export class AllTaskController {
   constructor(private allTaskService: AllTaskService) { }
 
   @Get()
-  find(@Query() getTaskListDto: GetTaskListDto): TaskListModel[] {
+  async find(@Query() getTaskListDto: GetTaskListDto) {
     if (Object.keys(getTaskListDto) && Object.keys(getTaskListDto).length) {
-      return this, this.allTaskService.find(getTaskListDto);
+      return await this, this.allTaskService.find(getTaskListDto);
     }
 
-    else { return this.allTaskService.findAll(); }
+    else { return await this.allTaskService.findAll(); }
   }
 
   @Post()
-  create(@Body() createAllTaskDto: CreateAllTaskDto): TaskListModel {
-    return this.allTaskService.create(createAllTaskDto);
+  async create(@Body() createAllTaskDto: CreateAllTaskDto): Promise<TaskListModel> {
+    return await this.allTaskService.create(createAllTaskDto);
   }
 
-  @Get(':ClientId')
-  findOne(@Param('ClientId') ClientId: string): TaskListModel {
-    return this.allTaskService.findOne(ClientId);
-  }
+  // @Get(':ClientId')
+  // findOne(@Param('ClientId') ClientId: string): TaskListModel {
+  //   return this.allTaskService.findOne(ClientId);
+  // }
 
-  @Put(':ClientId')
-  update(@Param('ClientId') ClientId: string, @Body() updateAllTaskDto: UpdateAllTaskDto) {
-    return this.allTaskService.update(ClientId, updateAllTaskDto);
-  }
+  // @Put(':ClientId')
+  // update(@Param('ClientId') ClientId: string, @Body() updateAllTaskDto: UpdateAllTaskDto) {
+  //   return this.allTaskService.update(ClientId, updateAllTaskDto);
+  // }
 
   @Delete(':ClientId')
   remove(@Param('ClientId') ClientId: string) {
