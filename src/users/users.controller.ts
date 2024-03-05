@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/jwt-auth/jwt-auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetTaskListDto } from './dto/get-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserModel } from './models/user.model';
+import { UserModel, UserModelBody, UserModelResponse } from './models/user.model';
 import { UsersService } from './users.service';
 
 @ApiTags('Users')
@@ -14,6 +14,7 @@ export class UsersController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: UserModelResponse })
   async find(@Query() getTaskListDto: GetTaskListDto) {
 
     if (Object.keys(getTaskListDto) && Object.keys(getTaskListDto).length) {
@@ -25,25 +26,30 @@ export class UsersController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiBody({ type: UserModelBody })
+  @ApiOkResponse({ type: UserModelResponse })
   async create(@Body() createUserDto: CreateUserDto): Promise<UserModel> {
     return await this.usersService.create(createUserDto);
   }
 
-  @Get(':id')
+  @Get(':ClientId')
   @UseGuards(JwtAuthGuard)
-  findOne(@Param('PhoneNumber') PhoneNumber: string) {
-    return this.usersService.findByPhoneNumber(PhoneNumber);
+  @ApiOkResponse({ type: UserModelResponse })
+  async findOne(@Param('ClientId') ClientId: string): Promise<UserModel> {
+    return await this.usersService.findOne(ClientId);
   }
 
-  @Put(':id')
+  @Put(':ClientId')
   @UseGuards(JwtAuthGuard)
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @ApiBody({ type: UserModelBody })
+  @ApiOkResponse({ type: UserModelResponse })
+  async update(@Param('ClientId') ClientId: string, @Body() updateUserDto: UpdateUserDto) {
+    return await this.usersService.update(ClientId, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete(':ClientId')
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  remove(@Param('ClientId') ClientId: string) {
+    return this.usersService.remove(ClientId);
   }
 }

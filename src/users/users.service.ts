@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -53,8 +53,14 @@ export class UsersService {
     return User;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(ClientId: string): Promise<UserModel> {
+    const User = await this.user_repository.findOne({
+      where: { ClientId: ClientId }
+    });
+
+    if (User) { return User; }
+
+    else { throw new HttpException('User not found', 404); }
   }
 
   async findByPhoneNumber(PhoneNumber: string): Promise<UserModel> {
@@ -71,11 +77,27 @@ export class UsersService {
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(ClientId: string, updateUserDto: UpdateUserDto) {
+    const User = await this.findOne(ClientId);
+
+    if (User) {
+      const result = await this.user_repository.update({ ClientId }, { ...updateUserDto });
+
+      return (result && result.affected === 1) ? updateUserDto : {};
+    }
+
+    else { throw new HttpException('User not found', 404); }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(ClientId: string) {
+    const User: any = await this.findOne(ClientId);
+
+    if (User && User.Id) {
+      const result = await this.user_repository.delete(User.Id);
+
+      return (result && result.affected === 1) ? true : false;
+    }
+
+    else { throw new HttpException('User not found', 404); }
   }
 }
